@@ -22,11 +22,11 @@ const instructions = Platform.select({
 });
 
 let chrono = require('chrono-node');
-let moment = require('moment');
+let moment = require('moment-timezone');
 
 const message = '';
 
-const processed = message.toLowerCase().replace('time:','').split('\n').join(' ');
+const processed = message.toLowerCase().replace('time:','').split('\n').join(' ').replace('  ',' ');
 
 console.log(processed);
 let dates = chrono.parse(processed);
@@ -38,7 +38,13 @@ console.log(dates);
 console.log(res);
 console.log(date);
 
-date = moment(date).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+date = moment.tz(chrono.parseDate(date.text), 'America/New_York');
+console.log(date);
+
+date = moment.tz(date, 'Europe/Dublin');
+console.log(date);
+
+date = date.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
 console.log(date);
 
