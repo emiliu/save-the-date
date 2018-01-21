@@ -26,7 +26,19 @@ let moment = require('moment');
 
 const message = '';
 
-let date = moment(chrono.parseDate(message)).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+const processed = message.toLowerCase().replace('time:','').split('\n').join(' ');
+
+console.log(processed);
+let dates = chrono.parse(processed);
+console.log(dates[0].text.length);
+let res = Math.max.apply(Math, dates.map(e => e.text.length));
+let date = dates.find(e => e.text.length === res);
+
+console.log(dates);
+console.log(res);
+console.log(date);
+
+date = moment(date).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
 console.log(date);
 
