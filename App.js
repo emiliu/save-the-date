@@ -17,7 +17,7 @@ import * as AddCalendarEvent from 'react-native-add-calendar-event';
 const eventConfig = {
   title: 'New Event',
   startDate: '2018-01-20T08:00:00.000Z',  // 3am est
-  endDate: '2018-01-20T14:00:00.000Z'     // 9am est
+  //endDate: '2018-01-20T14:00:00.000Z'     // 9am est
 }
 
 const instructions = Platform.select({
@@ -26,6 +26,11 @@ const instructions = Platform.select({
   android: 'Double tap R on your keyboard to reload,\n' +
     'Shake or press menu button for dev menu',
 });
+
+let chrono = require('chrono-node');
+let moment = require('moment');
+
+const message = '';
 
 export default class App extends Component<{}> {
   render() {
@@ -36,6 +41,8 @@ export default class App extends Component<{}> {
         </Text>
         <Button
           onPress={() => {
+
+            console.log(moment(chrono.parseDate(message)).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'));
 
             AddCalendarEvent.presentNewCalendarEventDialog(eventConfig)
               .then(eventId => {
