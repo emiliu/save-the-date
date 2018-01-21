@@ -24,36 +24,41 @@ const instructions = Platform.select({
 let chrono = require('chrono-node');
 let moment = require('moment-timezone');
 
-const message = '';
+const msg = '';
 
-const processed = message.toLowerCase().replace('time:','').split('\n').join(' ').replace('  ',' ');
+let process_text = (message) => message.toLowerCase().replace('time:','').split('\n').join(' ').replace('  ',' ');
 
-console.log(processed);
-let dates = chrono.parse(processed);
-console.log(dates[0].text.length);
-let res = Math.max.apply(Math, dates.map(e => e.text.length));
-let date = dates.find(e => e.text.length === res);
-
-console.log(dates);
-console.log(res);
-console.log(date);
-
-date = moment.tz(chrono.parseDate(date.text), 'America/New_York');
-console.log(date);
-
-date = moment.tz(date, 'Europe/Dublin');
-console.log(date);
-
-date = date.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-
-console.log(date);
-
-const eventConfig = {
-  title: 'New Event',
-  startDate: date, // '2018-01-20T08:00:00.000Z',  // 3am est
-  //endDate: '2018-01-20T14:00:00.000Z'     // 9am est
+let parse_date = (message) => {
+  let dates = chrono.parse(message);
+  let res = Math.max.apply(Math, dates.map(e => e.text.length));
+  let date = dates.find(e => e.text.length === res);
+  date_est = moment.tz(chrono.parseDate(date.text), 'America/New_York');
+  date_utc = moment.tz(date_est, 'Europe/Dublin');
+  date_str = date_utc.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+  console.log(date_str);
+  return date_str;
 }
 
+let add_event = (message) => {
+  let date = parse_date(process_text(message));
+
+  const eventConfig = {
+    title: 'New Event',
+    startDate: date
+  }
+
+  AddCalendarEvent.presentNewCalendarEventDialog(eventConfig)
+    .then(eventId => {
+      if (eventId) {
+        console.warn(eventId);
+      } else {
+        console.warn('dismissed');
+      }
+    })
+    .catch((error: string) => {
+      console.warn(error);
+    });
+}
 
 export default class App extends Component<{}> {
   render() {
@@ -65,17 +70,7 @@ export default class App extends Component<{}> {
         <Button
           onPress={() => {
 
-            AddCalendarEvent.presentNewCalendarEventDialog(eventConfig)
-              .then(eventId => {
-                if (eventId) {
-                  console.warn(eventId);
-                } else {
-                  console.warn('dismissed');
-                }
-              })
-              .catch((error: string) => {
-                console.warn(error);
-              });
+            add_event(msg);
 
             console.log('hello');
 
