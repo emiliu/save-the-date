@@ -7,11 +7,13 @@
 import React, { Component } from 'react';
 import {
   Button,
+  Image,
   Platform,
   StyleSheet,
   Text,
   View
 } from 'react-native';
+import PhotoUpload from 'react-native-photo-upload';
 import * as AddCalendarEvent from 'react-native-add-calendar-event';
 
 const instructions = Platform.select({
@@ -67,13 +69,36 @@ export default class App extends Component<{}> {
         <Text style={styles.welcome}>
           Welcome to React Native!
         </Text>
+        <PhotoUpload
+          onPhotoSelect={avatar => {
+            if (avatar) {
+              console.log('Image base64 string: ', avatar);
+            }
+          }}
+        >
+          <Image
+            style={{
+              paddingVertical: 30,
+              width: 150,
+              height: 150,
+              borderRadius: 75
+            }}
+            resizeMode='cover'
+            source={{
+              'uri': 'https://www.sparklabs.com/forum/styles/comboot/theme/images/default_avatar.jpg'
+            }}
+          />
+        </PhotoUpload>
+        <Button
+          onPress={() => {
+            console.log('upload');
+          }}
+          title="Upload"
+        />
         <Button
           onPress={() => {
 
             console.log('hello');
-
-            //fetch('https://facebook.github.io/react-native/movies.json')
-            //  .then((response) => console.log(response));
 
             fetch('https://vision.googleapis.com/v1/images:annotate?key=', {
               method: 'POST',
@@ -93,17 +118,16 @@ export default class App extends Component<{}> {
                       }
                     ],
                     "image": {
-                      "source": {
-                        "imageUri": ""
-                      }
+                      "content": "",
                     }
                   }
                 ]
               })
             }).then((response) => {
               response.json().then((res) => {
+                console.log(res.responses[0]);
                 let msg = res.responses[0].fullTextAnnotation.text;
-                console.log(msg);
+                //console.log(msg);
                 add_event(msg);
               });
             });
