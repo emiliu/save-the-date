@@ -14,12 +14,6 @@ import {
 } from 'react-native';
 import * as AddCalendarEvent from 'react-native-add-calendar-event';
 
-const eventConfig = {
-  title: 'New Event',
-  startDate: '2018-01-20T08:00:00.000Z',  // 3am est
-  //endDate: '2018-01-20T14:00:00.000Z'     // 9am est
-}
-
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' +
     'Cmd+D or shake for dev menu',
@@ -32,6 +26,17 @@ let moment = require('moment');
 
 const message = '';
 
+let date = moment(chrono.parseDate(message)).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+
+console.log(date);
+
+const eventConfig = {
+  title: 'New Event',
+  startDate: date, // '2018-01-20T08:00:00.000Z',  // 3am est
+  //endDate: '2018-01-20T14:00:00.000Z'     // 9am est
+}
+
+
 export default class App extends Component<{}> {
   render() {
     return (
@@ -41,8 +46,6 @@ export default class App extends Component<{}> {
         </Text>
         <Button
           onPress={() => {
-
-            console.log(moment(chrono.parseDate(message)).format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'));
 
             AddCalendarEvent.presentNewCalendarEventDialog(eventConfig)
               .then(eventId => {
