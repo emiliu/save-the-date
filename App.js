@@ -4,6 +4,8 @@
  * @flow
  */
 
+'use strict';
+
 import React, { Component } from 'react';
 import {
   Button,
@@ -50,7 +52,9 @@ let request_vision = (base64img) => {
             }
           ],
           "image": {
-            "content": base64img,
+            "source": {
+              "imageUri": "https://lh3.googleusercontent.com/8h6vsmdaW7UKux3ldld9TTIxcGyG3AbCD_bIUCiUztE3XuIgD5aBUJeb-unMC6xCc_KKb7jgMcsf0A51v4DL8gA3LRN2Dj0AIOuCVSXMAL_fhfvAoBQPmvpnYlgP1mAMPiCrGpSes92BRofWSB3tqs7DoDOqfb_vRGcm47_WtuMy14HwQvwWZi23in7t9FN6Zch_CVah3xuAef-KV0UTaA5JK56PM5G2hFNjS85eAk8OWvYcEiGA5Eh2iwXYleTWHbveQ96iWJelfdMGxC9YbsLtjgWnlus5GVQ19N3yADHCGcRkDag1Xw4k51l6KPYBjzjLJLcy66gtNtYiQezRmsCD4l-ozXRxa_19QVdyonLjcl467H42GOx_GCT9C4zzvhdDec8W7Y_Aor5-pJShj3_JTc408H0T9T4LCEXjbw0Q-8W18JfBFNi0tJLn2RoFSyT_p4mUodGhM2bUY12vfFGMbD0uQCH3hKiXxoUAsXkaWjm_mp2x6auGmRksV2dVM_12GwPUP73Pgn7P_lztG6tfdR5sa5vUDZEwZftUhy9l8-ScAb7q2mkgUoBSqLKsxMRfnXGDl7oM70p53T9-rh4H8_ZL4HwxejrvnMTi=w455-h678-no"
+            }
           }
         }
       ]
@@ -59,8 +63,18 @@ let request_vision = (base64img) => {
     response.json().then((res) => {
       console.log(res.responses[0]);
       let msg = res.responses[0].fullTextAnnotation.text;
-      console.log(msg);
-      add_event(msg);
+      //let title = [for (word of res.responses[0].fullTextAnnotation.pages[0].blocks[0].paragraphs[0].words) 'a'([for (letter of word.symbols) letter.text].join(''))].join('');
+      //let title = 'New Event';
+      let title = '';
+      let words = res.responses[0].fullTextAnnotation.pages[0].blocks[0].paragraphs[0].words;
+      for (let i = 0; i < words.length; i++) {
+        let word = words[i];
+        for (let j = 0; j < word.symbols.length; i++) {
+          title += word.symbols.text;
+        }
+      }
+      console.log(title);
+      add_event(msg, title);
       console.log('add');
     });
   });
@@ -81,12 +95,12 @@ let parse_date = (message) => {
   return date_str;
 }
 
-let add_event = (message) => {
+let add_event = (message, title) => {
   let date = parse_date(process_text(message));
   console.log(date);
 
   const eventConfig = {
-    title: 'New Event',
+    title: title,
     startDate: date
   }
 
@@ -112,6 +126,7 @@ export default class App extends Component<{}> {
         </Text>
         <PhotoUpload
           onPhotoSelect={img => {
+            console.log(img);
             if (img) {
               request_vision(img);
             }
@@ -119,9 +134,9 @@ export default class App extends Component<{}> {
         >
           <Image
             style={{
-              paddingVertical: 30,
-              width: 300,
-              height: 400
+              paddingVertical: 0,
+              width: 800,
+              height: 1000
             }}
             resizeMode='cover'
             source={{
@@ -132,6 +147,7 @@ export default class App extends Component<{}> {
         <Button
           onPress={() => {
             console.log('upload');
+            request_vision('');
           }}
           title="Upload"
         />
